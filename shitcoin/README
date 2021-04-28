@@ -1,0 +1,18 @@
+shitcoin - a useless cryptocurrency
+====================================
+don't use it, it's just for fun
+
+Installation
+-------------
+Edit config.mk first
+
+        $ make
+        # make install clean
+
+shitcoin will be installed in /usr/local/bin by default.
+
+To-Do
+-----
+- sign transactions
+- generate key pairs
+- implement simple wallet

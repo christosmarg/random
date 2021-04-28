@@ -1,0 +1,25 @@
+.Dd brainfuck\-VERSION
+.Dt BRAINFUCK 1
+.Os
+.Sh NAME
+.Nm brainfuck
+.Nd a simple brainfuck interpreter
+.Sh SYNOPSIS
+.Nm
+stdin
+.Sh DESCRIPTION
+.Nm
+reads input from stdin and interprets it
+as Brainfuck source code.
+.Sh EXAMPLES
+To parse a Brainfuck source file
+.Pp
+.Dl $ brainfuck < src.bf
+.Pp
+Alternatively, you can pipe to
+.Nm
+.Pp
+.Dl $ cat src.bf | brainfuck
+.Pp
+.Sh AUTHORS
+.An Christos Margiolis Aq Mt christos@christosmarg.xyz

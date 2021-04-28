@@ -1,0 +1,28 @@
+.Dd fnc\-VERSION
+.Dt FNC 1
+.Os
+.Sh NAME
+.Nm fnc
+.Nd a simple finance program
+.Sh SYNOPSIS
+.Nm
+.Op Fl d Ar date
+.Ar file
+.Sh DESCRIPTION
+.Pp
+.Nm
+reads a CSV file structured like this:
+
+        Date,Item,Price
+        Feb2021,Foo,+1
+        Mar2021,Bar,-2
+        Apr2021,Baz,+3
+
+The dates must also not have spaces between them
+(e.g Feb 2021) in case you want to use the -d option.
+.Sh OPTIONS
+.Bl -tag -width -indent
+.It Fl d Ar date
+prints only the fields matching the specified date.
+.Sh AUTHORS
+.An Christos Margiolis Aq Mt christos@christosmarg.xyz

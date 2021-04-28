@@ -1,0 +1,16 @@
+brainfuck - a brainfuck interpreter
+==========================================
+brainfuck reads input from stdin and interprets it
+as Brainfuck source code.
+
+Usage
+-----
+        cd path/to/brainfuck
+        make
+        ./brainfuck < src.bf
+
+You can install brainfuck by running:
+
+        sudo make install clean
+
+The binary will be installed in usr/local/bin.
