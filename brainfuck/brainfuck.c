@@ -19,7 +19,7 @@ main(int argc, char *argv[])
 
 	if ((src = malloc(len)) == NULL) {
 		perror("malloc");
-		exit(EXIT_FAILURE);
+		exit(1);
 	}
 	strcpy(src, buf);
 	memset(buf, 0, len);

@@ -1,37 +1,76 @@
+#include <err.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#include <ncurses.h>
+#include <curses.h>
 
 #include "defs.h"
 
+/* TODO:
+ * - play again
+ * - win fix
+ * - first open
+ */
+
 struct minecurses {
-	WINDOW *gamewin;
+	WINDOW *gw;
 	char **dispboard;
 	char **mineboard;
+	int x;
+	int y;
+	int xmax;
+	int ymax;
+	int wxmax;
+	int wymax;
 	int rows;
 	int cols;
 	int nmines;
-	int ndefused;
+	int ndef;
 	int move;
-	int x;
-	int y;
 	int gameover;
 };
 
+static void cursesinit(struct minecurses *);
+static void gwinit(struct minecurses *);
 static void gamereset(struct minecurses *);
-static void gamerestart(struct minecurses *);
 static void gamestart(struct minecurses *);
-static int valset(int, const char *, int, int);
+static int valset(int, int, const char *, int, int);
 static int adjcount(const struct minecurses *, int, int);
 static void boardsdealloc(struct minecurses *);
 static void cellreveal(const struct minecurses *);
 static void boardprint(const struct minecurses *);
-static WINDOW *gamewininit(int, int);
 static void menuopts(void);
 static void endscreen(struct minecurses *, int);
 static void *emalloc(size_t);
+
+static void
+cursesinit(struct minecurses *m)
+{
+	if (!initscr())
+		errx(1, "initscr");
+	noecho();
+	cbreak();
+
+	m->xmax = getmaxx(stdscr);
+	m->ymax = getmaxy(stdscr);
+}
+
+static void
+gwinit(struct minecurses *m)
+{
+	int wr, wc, wy, wx;
+	
+	wr = SCRSPACE_Y(m->rows);
+	wc = SCRSPACE_X(m->cols);
+	wy = CENTER(m->ymax, wr);
+	wx = CENTER(m->xmax, wc);
+	if ((m->gw = newwin(wr, wc, wy, wx)) == NULL)
+		errx(1, "newwin");
+
+	m->wxmax = getmaxx(m->gw);
+	m->wymax = getmaxy(m->gw);
+}
 
 static void
 gamereset(struct minecurses *m)
@@ -39,18 +78,16 @@ gamereset(struct minecurses *m)
 	size_t i, j, r, c;
 
 	echo();
-	m->cols = valset(4, MSG_COLS, 5, ARRSPACE_X(XMAX(stdscr)) - 2);
-	m->rows = valset(3, MSG_ROWS, 5, ARRSPACE_Y(YMAX(stdscr)) - 3);
-	m->nmines = valset(2, MSG_MINES, 1, m->rows * m->cols - 15);
+	m->cols = valset(m->ymax, 4, MSG_COLS, 5, ARRSPACE_X(m->xmax) - 2);
+	m->rows = valset(m->ymax, 3, MSG_ROWS, 5, ARRSPACE_Y(m->ymax) - 3);
+	m->nmines = valset(m->ymax, 2, MSG_MINES, 1, m->rows * m->cols - 15);
 	m->x = m->y = 0;
-	m->ndefused = 0;
+	m->ndef = 0;
 	m->gameover = 0;
 	noecho();
 
+	gwinit(m);
 	menuopts();
-	if (m->gamewin == NULL)
-		m->gamewin = gamewininit(m->rows, m->cols);
-
 	/* allocate memory for the boards */
 	m->dispboard = emalloc(m->rows * sizeof(char *));
 	m->mineboard = emalloc(m->rows * sizeof(char *));
@@ -85,13 +122,6 @@ gamereset(struct minecurses *m)
 				m->mineboard[i][j] = '-';
 }
 
-static void
-gamerestart(struct minecurses *m)
-{
-	boardsdealloc(m);
-	gamereset(m);
-}
-
 #define bx m->x
 #define by m->y
 
@@ -101,50 +131,44 @@ gamestart(struct minecurses *m)
 	static int y = 1, x = 2;
 
 	for (;;) {
+		werase(m->gw);
 		erase();
-		// is this necessary?
-		delwin(m->gamewin);
-		m->gamewin = gamewininit(m->rows, m->cols);
-		refresh();
-		boardprint(m);
 
+		boardprint(m);
 		CURS_UPDATE(m, y, x);
 		bx = ARRSPACE_X(x);
 		by = ARRSPACE_Y(y);
 
 		/* session info */
 		mvprintw(0, 0, MSG_CURPOS, bx, by);
-		mvprintw(0, XMID(stdscr) - ((strlen(MSG_NDEFUSED) - 2) >> 1),
-		    MSG_NDEFUSED, m->ndefused, m->nmines);
-		mvprintw(0, XMAX(stdscr) - strlen(OPT_CTRLS), OPT_CTRLS);
+		mvprintw(0, CENTER(m->xmax, strlen(MSG_NDEFUSED) - 2),
+		    MSG_NDEFUSED, m->ndef, m->nmines);
+		mvprintw(0, m->xmax - strlen(OPT_CTRLS), OPT_CTRLS);
 
 		refresh();
+		wrefresh(m->gw);
 
 		/* handle moves */
-		switch (m->move = wgetch(m->gamewin)) {
-		case MOVE_UP_NORM:	/* FALLTHROUGH */
-		case MOVE_UP_VIM:
+		switch (m->move = wgetch(m->gw)) {
+		case MOVE_UP:
 			if (--y < 1)
 				y = 1;
 			break;
-		case MOVE_DOWN_NORM:	/* FALLTHROUGH */
-		case MOVE_DOWN_VIM:
-			if (++y > XMAX(m->gamewin) - 2)
-				y = YMAX(m->gamewin) - 2;
+		case MOVE_DOWN:
+			if (++y > m->wxmax - 2)
+				y = m->wymax - 2;
 			break;
-		case MOVE_LEFT_NORM:	/* FALLTHROUGH */
-		case MOVE_LEFT_VIM:
+		case MOVE_LEFT:
 			x -= 3;
 			if (x < 2)
 				x = 2;
 			break;
-		case MOVE_RIGHT_NORM:	/* FALLTHROUGH */
-		case MOVE_RIGHT_VIM:
+		case MOVE_RIGHT:
 			x += 3;
-			if (x > XMAX(m->gamewin) - 3)
-				x = XMAX(m->gamewin) - 3;
+			if (x > m->wxmax - 3)
+				x = m->wxmax - 3;
 			break;
-		case MOVE_ENTER:	/* FALLTHROUGH */
+		case MOVE_ENTER: /* FALLTHROUGH */
 		case MOVE_OPEN_CELL:
 			m->dispboard[by][bx] = m->mineboard[by][bx];
 			m->gameover = IS_MINE(m, by, bx);
@@ -161,7 +185,7 @@ gamestart(struct minecurses *m)
 			break;
 		case MOVE_DEFUSE_CELL:
 			if (IS_FLAGGED(m, by, bx) &&  IS_MINE(m, by, bx)) {
-				m->ndefused++;
+				m->ndef++;
 				m->dispboard[by][bx] = MINE_DEFUSED;
 				m->mineboard[by][bx] = MINE_DEFUSED;
 				cellreveal(m);
@@ -170,24 +194,20 @@ gamestart(struct minecurses *m)
 			break;
 		case MOVE_OPEN_MENU:
 			menuopts();
-			box(m->gamewin, 0, 0);
 			boardprint(m);
-			break;
-		case MOVE_RESTART:
-			gamerestart(m);
 			break;
 		}
 
 		if (OUT_OF_BOUNDS(m, by, bx)
-		||  m->ndefused > m->nmines
 		||  m->gameover
+		||  m->ndef == m->nmines
 		||  m->move == MOVE_QUIT)
 			break;
 	}
 
 	if (m->gameover)
 		endscreen(m, GAME_LOST);
-	else if (m->ndefused == m->nmines)
+	else if (m->ndef == m->nmines)
 		endscreen(m, GAME_WON);
 }
 
@@ -195,14 +215,15 @@ gamestart(struct minecurses *m)
 #undef by
 
 static int
-valset(int offy, const char *msg, int min, int max)
+valset(int ymax, int offy, const char *msg, int min, int max)
 {
 	int val;
 
 	do {
-		mvprintw(YMAX(stdscr)-offy, 1, msg, min, max);
+		mvprintw(ymax - offy, 1, msg, min, max);
 		scanw("%d", &val);
 	} while (val < min || val > max);
+
 	return val;
 }
 
@@ -228,7 +249,7 @@ boardsdealloc(struct minecurses *m)
 {
 	size_t i = 0;
 
-	if (!m->dispboard && !m->mineboard) {
+	if (m->dispboard && m->mineboard) {
 		for (; i < m->rows; i++) {
 			free(m->dispboard[i]);
 			free(m->mineboard[i]);
@@ -241,10 +262,7 @@ boardsdealloc(struct minecurses *m)
 static void
 cellreveal(const struct minecurses *m)
 {
-	int y = m->y + 1;
-	int x = SCRSPACE_X(m->x);
-
-	mvwaddch(m->gamewin, y, x, m->dispboard[m->y][m->x]);
+	mvwaddch(m->gw, m->y + 1, SCRSPACE_X(m->x), m->dispboard[m->y][m->x]);
 }
 
 static void
@@ -252,35 +270,18 @@ boardprint(const struct minecurses *m)
 {    
 	size_t i, j, x, y;
 
-	wattroff(m->gamewin, A_BOLD);
+	wattroff(m->gw, A_BOLD);
+	box(m->gw, 0, 0);
 	for (i = 1; i <= m->rows; i++) {
-		wmove(m->gamewin, i, 1);
+		wmove(m->gw, i, 1);
 		for (j = 0; j < m->cols; j++)
-			wprintw(m->gamewin, GRID_BOX);
+			waddstr(m->gw, GRID_BOX);
 	}
-
-	wattron(m->gamewin, A_BOLD);
+	wattron(m->gw, A_BOLD);
 	for (i = 0, y = 1; i < m->rows; i++, y++)
 		for (j = 0, x = 2; j < m->cols; j++, x += 3)
-			mvwaddch(m->gamewin, y, x, m->dispboard[i][j]);
-}
-
-static WINDOW *
-gamewininit(int rows, int cols)
-{
-	WINDOW *gw;
-	int wr, wc, wy, wx;
-	
-	wr = SCRSPACE_Y(rows);
-	wc = SCRSPACE_X(cols);
-	wy = CENTER(YMAX(stdscr), wr);
-	wx = CENTER(XMAX(stdscr), wc);
-	gw = newwin(wr, wc, wy, wx);
-	wattron(gw, A_BOLD);
-	box(gw, 0, 0);
-	wattroff(gw, A_BOLD);
-
-	return gw;
+			mvwaddch(m->gw, y, x, m->dispboard[i][j]);
+	wattroff(m->gw, A_BOLD);
 }
 
 static void
@@ -290,25 +291,24 @@ menuopts(void)
 	int w, h, wy, wx;
 
 	w = 36;
-	h = 13;
-	wy = CENTER(YMAX(stdscr), h);
-	wx = CENTER(XMAX(stdscr), w);
+	h = 12;
+	wy = CENTER(getmaxy(stdscr), h);
+	wx = CENTER(getmaxx(stdscr), w);
 	opts = newwin(h, w, wy, wx);
 	box(opts, 0, 0);
 
 	/* fill menu */
 	mvwprintw(opts, 1, 1, OPT_QUIT);
-	mvwprintw(opts, 2, 1, OPT_RESTART);
-	mvwprintw(opts, 3, 1, OPT_MOVE_UP);
-	mvwprintw(opts, 4, 1, OPT_MOVE_DOWN);
-	mvwprintw(opts, 5, 1, OPT_MOVE_LEFT);
-	mvwprintw(opts, 6, 1, OPT_MOVE_RIGHT);
-	mvwprintw(opts, 7, 1, OPT_FLAG_CELL);
-	mvwprintw(opts, 8, 1, OPT_DEFUSE);
-	mvwprintw(opts, 9, 1, OPT_OPEN_CELL);
-	mvwprintw(opts, 11, 1, MSG_QUIT_MENU);
+	mvwprintw(opts, 2, 1, OPT_MOVE_UP);
+	mvwprintw(opts, 3, 1, OPT_MOVE_DOWN);
+	mvwprintw(opts, 4, 1, OPT_MOVE_LEFT);
+	mvwprintw(opts, 5, 1, OPT_MOVE_RIGHT);
+	mvwprintw(opts, 6, 1, OPT_FLAG_CELL);
+	mvwprintw(opts, 7, 1, OPT_DEFUSE);
+	mvwprintw(opts, 8, 1, OPT_OPEN_CELL);
+	mvwprintw(opts, 10, 1, MSG_QUIT_MENU);
 
-	wgetch(opts);
+	(void)wgetch(opts);
 	delwin(opts);
 }
 
@@ -316,8 +316,8 @@ static void
 endscreen(struct minecurses *m, int state)
 {
 	curs_set(0);
-	wclear(m->gamewin);
-	wrefresh(m->gamewin);
+	wclear(m->gw);
+	wrefresh(m->gw);
 	attron(A_BOLD);
 	switch (state) {
 	case GAME_WON:
@@ -334,7 +334,6 @@ endscreen(struct minecurses *m, int state)
 	refresh();
 	attroff(A_BOLD);
 	getchar();
-	// TODO: restart option
 }
 
 static void *
@@ -342,31 +341,27 @@ emalloc(size_t nb)
 {
 	void *p;
 
-	if ((p = malloc(nb)) == NULL) {
-		fputs("malloc", stderr);
-		exit(EXIT_FAILURE);
-	}
+	if ((p = malloc(nb)) == NULL)
+		err(1, "malloc");
+
 	return p;
 }
 
 int
 main(int argc, char *argv[])
 {
-	struct minecurses m;
+	struct minecurses *m;
 
-	if (!initscr()) {
-		fputs("initscr", stderr);
-		return 1;
-	}
-	noecho();
-	cbreak();
+	m = emalloc(sizeof(struct minecurses));
+	cursesinit(m);
 
-	gamereset(&m);
-	gamestart(&m);
+	gamereset(m);
+	gamestart(m);
 
-	boardsdealloc(&m);
-	delwin(m.gamewin);
+	boardsdealloc(m);
+	delwin(m->gw);
 	endwin();
+	free(m);
 
-	return EXIT_SUCCESS;
+	return 0;
 }

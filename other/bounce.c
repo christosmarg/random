@@ -1,4 +1,4 @@
-#include <ncurses.h>
+#include <curses.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -12,9 +12,10 @@ struct ball {
 };
 
 static void
-init_curses(void)
+cursesinit(void)
 {
-	initscr();
+	if (!initscr())
+		exit(1);
 	cbreak();
 	noecho();
 	curs_set(0);
@@ -36,11 +37,10 @@ main(int argc, char *argv[])
 {
 	struct ball b = {1, 2, 1, 1, 0, 0};
 
-	init_curses();
+	cursesinit();
 	getmaxyx(stdscr, b.ymax, b.xmax);
 
-	for (;;)
-	{
+	for (;;) {
 		erase();
 		collision(&b);
 		mvaddch(b.y, b.x, 'O');

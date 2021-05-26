@@ -1,14 +1,14 @@
+# See LICENSE file for copyright and license details.
 # minecurses version
-VERSION = 0
+VERSION = 0.1
 
 # paths
 PREFIX = /usr/local
-MAN_DIR = ${PREFIX}/share/man/man6
-BIN_DIR = ${PREFIX}/bin
+MANPREFIX = ${PREFIX}/share/man
 
 # includes and libs
-INCS = -Iinclude 
-LIBS = -Llib -lncurses
+INCS = -Iinclude
+LIBS = -Llib -lncursesw
 
 # flags
 CPPFLAGS = -D_DEFAULT_SOURCE -D_BSD_SOURCE -D_POSIX_C_SOURCE=200809L \
@@ -16,15 +16,5 @@ CPPFLAGS = -D_DEFAULT_SOURCE -D_BSD_SOURCE -D_POSIX_C_SOURCE=200809L \
 CFLAGS = -std=c99 -pedantic -Wall -Os ${INCS} ${CPPFLAGS}
 LDFLAGS = ${LIBS}
 
-# utils
-CP = cp -f
-RM = rm -f
-RM_DIR = rm -rf
-MV = mv
-MKDIR = mkdir -p
-RM_DIR = rm -rf
-TAR = tar -cf
-GZIP = gzip
-
 # compiler
-CC = gcc
+CC = cc

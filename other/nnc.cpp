@@ -3,14 +3,14 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
-#include <ncurses.h>
+#include <curses.h>
 
-static constexpr int ymax()
+static int ymax()
 {
 	return getmaxy(stdscr);
 }
 
-static constexpr int xmax()
+static int xmax()
 {
 	return getmaxx(stdscr);
 }
@@ -22,7 +22,7 @@ struct Color {
 	Color(int x, int y, int color)
 		:x(x), y(y), color(color) {}
 
-	constexpr int dist(const Color& c)
+	int dist(const Color& c)
 	{
 		int dx = this->x - c.x;
 		int dy = this->y - c.y;
@@ -47,9 +47,10 @@ struct White: public Color {
 };
 
 static void
-init_curses()
+cursesinit()
 {
-	initscr();
+	if (!initscr())
+		exit(1);
 	cbreak();
 	noecho();
 	curs_set(0);
@@ -137,11 +138,12 @@ dealloc(std::vector<T *>& vec)
 int
 main(int argc, char **argv)
 {
-	init_curses();
-	std::srand(std::time(nullptr));
-
 	std::vector<Color *> points;
 	std::vector<White *> whites;
+
+	cursesinit();
+	std::srand(std::time(nullptr));
+
 	makepts(points);
 	makewts(whites);
 

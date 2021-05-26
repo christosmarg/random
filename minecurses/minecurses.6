@@ -8,24 +8,23 @@
 .Nm
 .Sh DESCRIPTION
 .Nm
-starts a minesweeper game using the
-.Xr ncurses 3
-library to draw the TUI.
+starts a 
+.Xr curses 3
+minesweeper game. The objective is to find and defuse all the mines,
+not open all the non-mine cells, like in most minesweeper games; this
+makes the game relatively harder.
 .Sh OPTIONS
-The following option are used during runtime in the TUI,
-not the command line.
+The following option are used on runtime:
 .Bl -tag -width 8n
 .It Sy q
 quit game
-.It Sy r
-restart game
-.It Sy w/k
+.It Sy w
 move up on the Y axis
-.It Sy s/j
+.It Sy s
 move down on the Y axis
-.It Sy a/h
+.It Sy a
 move left on the X axis
-.It Sy d/l
+.It Sy d
 move right on the X axis
 .It Sy f
 flag cell
@@ -34,6 +33,6 @@ defuse mine (if flagged only)
 .It Sy ENTER/o
 open cell
 .Sh SEE ALSO
-.Xr ncurses 3
+.Xr curses 3
 .Sh AUTHORS
-.An Christos Margiolis Aq Mt christos@christosmarg.xyz
+.An Christos Margiolis Aq Mt christos@margiolis.net

@@ -89,11 +89,11 @@ main(int argc, char *argv[])
 
 	if (argc != 2) {
 		fprintf(stderr, "usage: %s rom\n", argv[0]);
-		return EXIT_FAILURE;
+		return 1;
 	}
 	if ((fp = fopen(argv[1], "r")) == NULL) {
 		fprintf(stderr, "fopen: %s\n", argv[1]);
-		return EXIT_FAILURE;
+		return 1;
 	}
 	for (i = 0; (mem[i] = fgetc(fp)) != EOF && i < sizeof(mem); i++)
 		;
@@ -108,7 +108,7 @@ main(int argc, char *argv[])
 
 	if (!win || !ren || !tex) {
 		fprintf(stderr, "SDL error: %s\n", SDL_GetError());
-		return EXIT_FAILURE;
+		return 1;
 	}
 
 	for (r = 0; r < 6; r++)
@@ -132,5 +132,5 @@ main(int argc, char *argv[])
 	SDL_DestroyWindow(win);
 	SDL_Quit();
 
-	return EXIT_SUCCESS;
+	return 0;
 }

@@ -4,7 +4,7 @@
 #include <list>
 #include <thread>
 
-#include <ncurses.h>
+#include <curses.h>
 
 #define XMAX (getmaxx(stdscr))
 #define YMAX (getmaxy(stdscr))
@@ -65,6 +65,8 @@ Snake::update(int key)
 		x++;
 		body.push_front({body.front().x + 1, body.front().y});
 		break;
+	default:
+		return;
 	}
 	body.pop_back();
 }
@@ -117,7 +119,8 @@ Food::draw()
 static void
 initcurses()
 {
-	initscr();
+	if (!initscr())
+		exit(1);
 	cbreak();
 	noecho();
 	curs_set(0);

@@ -1,3 +1,4 @@
+#include <err.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +45,6 @@ static long balance(const char *);
 static void printchain(void);
 static void cleanchain(void);
 static void *emalloc(size_t);
-static void die(const char *, ...);
 
 static struct blockchain *chain;
 
@@ -55,7 +55,7 @@ transaction(const char *from, const char *to, long amount)
 		chain->pending[chain->npending++] =
 		    newblock(from, to, amount, NULL);
 	else
-		fprintf(stderr, "transaction array is full\n");
+		warnx("transaction array is full");
 }
 
 static struct block *
@@ -128,7 +128,7 @@ minepending(const char *rewaddr)
 
 	if ((chain->blocks = realloc(chain->blocks,
 	    sizeof(struct block *) * (chain->nblocks + chain->npending + 1))) == NULL)
-		die("realloc:");
+		err(1, "realloc");
 
 	for (; i < chain->npending; i++) {
 		b = chain->pending[i];
@@ -234,27 +234,9 @@ emalloc(size_t nb)
 	void *p;
 
 	if ((p = malloc(nb)) == NULL)
-		die("malloc:");
+		err(1, "malloc");
 
 	return p;
-}
-
-static void
-die(const char *fmt, ...)
-{
-	va_list args;
-	
-	va_start(args, fmt);
-	vfprintf(stderr, fmt, args);
-	va_end(args);
-
-	if (fmt[0] && fmt[strlen(fmt)-1] == ':') {
-		fputc(' ', stderr);
-		perror(NULL);
-	} else
-		fputc('\n', stderr);
-
-	exit(EXIT_FAILURE);
 }
 
 int

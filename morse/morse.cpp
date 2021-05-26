@@ -1,6 +1,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
@@ -56,7 +57,7 @@ main(int argc, char *argv[])
 		{'/', "-..-."  }, {' ', " / "	 }
 	};
 
-	if (SDL_Init(SDL_INIT_AUDIO) == -1)
+	if (SDL_Init(SDL_INIT_AUDIO) < 0)
 		return -1;
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 1, 4096);
 	dot  = Mix_LoadWAV("dot.wav");

@@ -1,17 +1,17 @@
 # minecurses
 
-A minesweeper game using `ncurses`. The game was originally made as a
+A minesweeper game using `curses`. The game was originally made as a
 university assignment of mine, but I decided to take it a bit further afterwards.
 
 ## How to play
 
 The objective is to simply find and defuse all the mines, not open all the non-mine
-cells, like in most minesweeper games; this make the game relatively harder.
+cells, like in most minesweeper games; this makes the game relatively harder.
 
 * Enter number of columns
 * Enter number of rows
 * Enter number of mines
-* Move with `w`/`s`/`a`/`d` or Vim keys (`k`/`j`/`h`/`l`)
+* Move with `w`/`s`/`a`/`d` keys
 * Open cell with `[ENTER]`, or `o`
 * Flag cell with `f`
 * Defuse mine (only if flagged) with `g`
@@ -21,18 +21,16 @@ cells, like in most minesweeper games; this make the game relatively harder.
 Additional controls
 
 * `m`: Open control menu
-* `r`: Restart the game
 * `q`: Quit
 
 ## Usage
 
 ```shell
-$ cd path/to/minecurses
 $ make && make run
 $ make clean # optional
 ```
-You can install `minecurses` by running `sudo make install clean`.
-The binary will be installed in `/usr/local/bin`.
+You can install `minecurses` by running `make install`. The binary will be 
+installed in `/usr/local/bin`.
 
 ## Preview
 
@@ -44,4 +42,3 @@ The binary will be installed in `/usr/local/bin`.
 ## To Do
 
 * Add colors
-* Fix occasional wrong mine spawning bug
