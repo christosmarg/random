@@ -7,12 +7,12 @@
 
 static int ymax()
 {
-	return getmaxy(stdscr);
+	return (getmaxy(stdscr));
 }
 
 static int xmax()
 {
-	return getmaxx(stdscr);
+	return (getmaxx(stdscr));
 }
 
 struct Color {
@@ -27,7 +27,7 @@ struct Color {
 		int dx = this->x - c.x;
 		int dy = this->y - c.y;
 
-		return std::sqrt(dx * dx + dy * dy);
+		return (std::sqrt(dx * dx + dy * dy));
 	}
 };
 
@@ -106,7 +106,7 @@ calc_dists(const std::vector<Color *>& points, const White& w)
 
 	for (auto& point : points)
 		dists.push_back(point->dist(w));
-	return dists;
+	return (dists);
 }
 
 static void
@@ -165,5 +165,5 @@ main(int argc, char **argv)
 	dealloc<Color>(points);
 	dealloc<White>(whites);
 
-	return 0;
+	return (0);
 }

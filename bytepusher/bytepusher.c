@@ -33,7 +33,7 @@ evhandle(void)
 	keybits = mem[0] << 8 | mem[1];
 	while (SDL_PollEvent(&ev)) {
 		if (ev.type == SDL_QUIT || ev.key.keysym.sym == SDLK_ESCAPE)
-			return 0;
+			return (0);
 		if (ev.type == SDL_KEYDOWN)
 			for (i = 0; i < 16; i++)
 				if (ev.key.keysym.sym == keys[i])
@@ -42,7 +42,7 @@ evhandle(void)
 	}
 	mem[0] = keybits >> 8;
 	mem[1] = keybits & 0xFF;
-	return 1;
+	return (1);
 }
 
 static void
@@ -89,11 +89,11 @@ main(int argc, char *argv[])
 
 	if (argc != 2) {
 		fprintf(stderr, "usage: %s rom\n", argv[0]);
-		return 1;
+		return (1);
 	}
 	if ((fp = fopen(argv[1], "r")) == NULL) {
 		fprintf(stderr, "fopen: %s\n", argv[1]);
-		return 1;
+		return (1);
 	}
 	for (i = 0; (mem[i] = fgetc(fp)) != EOF && i < sizeof(mem); i++)
 		;
@@ -108,7 +108,7 @@ main(int argc, char *argv[])
 
 	if (!win || !ren || !tex) {
 		fprintf(stderr, "SDL error: %s\n", SDL_GetError());
-		return 1;
+		return (1);
 	}
 
 	for (r = 0; r < 6; r++)
@@ -132,5 +132,5 @@ main(int argc, char *argv[])
 	SDL_DestroyWindow(win);
 	SDL_Quit();
 
-	return 0;
+	return (0);
 }

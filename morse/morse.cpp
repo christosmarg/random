@@ -58,7 +58,7 @@ main(int argc, char *argv[])
 	};
 
 	if (SDL_Init(SDL_INIT_AUDIO) < 0)
-		return -1;
+		return (1);
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 1, 4096);
 	dot  = Mix_LoadWAV("dot.wav");
 	dash = Mix_LoadWAV("dash.wav");
@@ -93,5 +93,5 @@ main(int argc, char *argv[])
 	Mix_CloseAudio();
 	SDL_Quit();
 
-	return 0;
+	return (0);
 }

@@ -94,7 +94,7 @@ Snake::collided()
 		&&  i->x == body.front().x
 		&&  i->y == body.front().y)
 			dead = true;
-	return dead;
+	return (dead);
 }
 
 Food::Food()
@@ -135,9 +135,9 @@ kbhit()
 
 	if ((c = getch()) != ERR) {
 		ungetch(c);
-		return true;
+		return (true);
 	}
-	return false;
+	return (false);
 }
 
 int
@@ -183,5 +183,5 @@ main(int argc, char *argv[])
 
 	endwin();
 
-	return 0;
+	return (0);
 }

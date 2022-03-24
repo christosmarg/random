@@ -4,6 +4,8 @@
 
 PREFIX = /usr/local
 MAN_DIR = ${PREFIX}/share/man/man1
+# OpenBSD
+#MAN_DIR = ${PREFIX}//man/man1
 BIN_DIR = ${PREFIX}/bin
 
 BIN = fnc

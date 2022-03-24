@@ -1,14 +1,14 @@
 # See LICENSE file for copyright and license details.
-# brainfuck - brainfuck interpreter
+# bf - bf interpreter
 .POSIX:
 
 include config.mk
 
-BIN = brainfuck
+BIN = bf
 DIST = ${BIN}-${VERSION}
 MAN1 = ${BIN}.1
 
-SRC = brainfuck.c
+SRC = bf.c
 OBJ = ${SRC:.c=.o}
 
 all: options ${BIN}
@@ -27,7 +27,7 @@ ${BIN}: ${OBJ}
 
 dist: clean
 	mkdir -p ${DIST}
-	cp -R tests brainfuck.1 brainfuck.c config.mk Makefile README ${DIST}
+	cp -R tests bf.1 bf.c config.mk Makefile README ${DIST}
 	tar -cf ${DIST}.tar ${DIST}
 	gzip ${DIST}.tar
 	rm -rf ${DIST}

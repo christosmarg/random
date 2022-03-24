@@ -77,7 +77,7 @@ newblock(const char *saddr, const char *raddr, long amount, const char *prevhash
 	strcpy(b->hash, calchash(b));
 	b->nonce = 0;
 
-	return b;
+	return (b);
 }
 
 static char *
@@ -101,7 +101,7 @@ calchash(struct block *b)
 		sprintf(&res[i << 1], "%02x", hash[i]);
 	res[HASH_LEN] = '\0';
 
-	return res;
+	return (res);
 }
 
 static void
@@ -160,7 +160,7 @@ mineblock(struct block *b)
 static struct block *
 lastblock(void)
 {
-	return chain->blocks[chain->nblocks - 1];
+	return (chain->blocks[chain->nblocks - 1]);
 }
 
 static int
@@ -171,13 +171,13 @@ validchain(void)
 	for (; i < chain->nblocks; i++) {
 		if (i != 0 && strcmp(chain->blocks[i]->prevhash,
 		    chain->blocks[i-1]->hash))
-			return 0;
+			return (0);
 		if (i != 0 && strcmp(chain->blocks[i]->hash,
 		    calchash(chain->blocks[i])))
-			return 0;
+			return (0);
 	}
 
-	return 1;
+	return (1);
 }
 
 static long
@@ -193,7 +193,7 @@ balance(const char *addr)
 			bal += chain->blocks[i]->data->amount;
 	}
 
-	return bal;
+	return (bal);
 }
 
 static void
@@ -236,7 +236,7 @@ emalloc(size_t nb)
 	if ((p = malloc(nb)) == NULL)
 		err(1, "malloc");
 
-	return p;
+	return (p);
 }
 
 int
@@ -254,5 +254,5 @@ main(int argc, char *argv[])
 
 	cleanchain();
 
-	return 0;
+	return (0);
 }

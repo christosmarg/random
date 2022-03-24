@@ -1,10 +1,12 @@
 # See LICENSE file for copyright and license details.
-# brainfuck version
+# bf version
 VERSION = 0.1
 
 # paths
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man
+# OpenBSD
+#MANPREFIX = ${PREFIX}/man
 
 # includes and libs
 INCS = -Iinclude

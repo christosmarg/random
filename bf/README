@@ -1,0 +1,17 @@
+bf
+==
+
+A brainfuck interpreter. bf reads input from stdin and interprets it
+as Brainfuck source code.
+
+Usage
+-----
+        cd path/to/bf
+        make
+        ./bf < src.bf
+
+You can install bf by running:
+
+        sudo make install clean
+
+The binary will be installed in usr/local/bin.

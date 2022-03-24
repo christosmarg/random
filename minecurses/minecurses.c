@@ -224,7 +224,7 @@ valset(int ymax, int offy, const char *msg, int min, int max)
 		scanw("%d", &val);
 	} while (val < min || val > max);
 
-	return val;
+	return (val);
 }
 
 static int
@@ -241,7 +241,7 @@ adjcount(const struct minecurses *m, int r, int c)
 	if (!OUT_OF_BOUNDS(m, r+1, c+1) && IS_MINE(m, r+1, c+1)) n++; // south-east
 	if (!OUT_OF_BOUNDS(m, r-1, c+1) && IS_MINE(m, r-1, c+1)) n++; // south-west
 
-	return n;
+	return (n);
 }
 
 static void
@@ -344,7 +344,7 @@ emalloc(size_t nb)
 	if ((p = malloc(nb)) == NULL)
 		err(1, "malloc");
 
-	return p;
+	return (p);
 }
 
 int
@@ -363,5 +363,5 @@ main(int argc, char *argv[])
 	endwin();
 	free(m);
 
-	return 0;
+	return (0);
 }

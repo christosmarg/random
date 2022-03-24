@@ -72,5 +72,5 @@ main(int argc, char *argv[])
 	}
 	free(src);
 
-	return 0;
+	return (0);
 }

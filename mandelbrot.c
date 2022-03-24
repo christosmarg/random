@@ -24,7 +24,7 @@ fmandelbrot(double cr, double ci)
 		zr = tmp;
 	}
 
-	return i;
+	return (i);
 }
 
 int
@@ -47,5 +47,5 @@ main(int argc, char *argv[])
 		printf("\n");
 	}
 
-	return 0;
+	return (0);
 }
