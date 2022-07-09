@@ -84,6 +84,7 @@ mydev_ioctl(struct cdev *dev, u_long cmd, caddr_t addr, int flags,
 		break;
 	case MYDEVIOC_RDWR:
 		fp = (foo_t *)addr;
+		uprintf("mydev: received: x=%d, y=%d\n", fp->x, fp->y);
 		fp->x += 5;
 		fp->y += 5;
 		break;

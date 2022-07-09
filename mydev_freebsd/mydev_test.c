@@ -28,7 +28,7 @@ main(int argc, char *argv[])
 
 	if (ioctl(dev, MYDEVIOC_RDWR, &foo) != 0)
 		err(1, "ioctl(MYDEVIOC_RDWR)");
-	printf("%s: x=%d, y=%d\n", getprogname(), foo.x, foo.y);
+	printf("%s received: x=%d, y=%d\n", getprogname(), foo.x, foo.y);
 
 	if (read(dev, buf, sizeof(buf)) < 0)
 		err(1, "read");
