@@ -10,35 +10,43 @@
 int
 main(int argc, char *argv[])
 {
-	foo_t foo;
-	char buf[32];
-	int dev;
+	bar_t bar;
+	char buf[BUFSIZ];
+	int fd;
 
-	if ((dev = open("/dev/mydev", O_RDWR)) < 0)
+	if ((fd = open("/dev/mydev", O_RDWR)) < 0)
 		err(1, "open(/dev/mydev)");
 
-	if (ioctl(dev, MYDEVIOC_READ, &foo) != 0)
+	if (ioctl(fd, MYDEVIOC_READ, &bar) != 0)
 		err(1, "ioctl(MYDEVIOC_READ)");
-	printf("%s: x=%d, y=%d\n", getprogname(), foo.x, foo.y);
+	printf("%s: ioctl(MYDEVIOC_READ)\t-> x=%d, y=%d\n",
+	    getprogname(), bar.x, bar.y);
 
-	foo.x = 1;
-	foo.y = 2;
-	if (ioctl(dev, MYDEVIOC_WRITE, &foo) != 0)
+	printf("%s: ioctl(MYDEVIOC_WRITE)\t-> ", getprogname());
+	fflush(stdout);
+
+	bar.x = 10;
+	bar.y = 20;
+	if (ioctl(fd, MYDEVIOC_WRITE, &bar) != 0)
 		err(1, "ioctl(MYDEVIOC_WRITE)");
 
-	if (ioctl(dev, MYDEVIOC_RDWR, &foo) != 0)
+	if (ioctl(fd, MYDEVIOC_RDWR, &bar) != 0)
 		err(1, "ioctl(MYDEVIOC_RDWR)");
-	printf("%s received: x=%d, y=%d\n", getprogname(), foo.x, foo.y);
+	printf("%s: ioctl(MYDEVIOC_RDWR)\t-> x=%d, y=%d\n",
+	    getprogname(), bar.x, bar.y);
 
-	if (read(dev, buf, sizeof(buf)) < 0)
-		err(1, "read");
-	printf("%s: %s\n", getprogname(), buf);
+	(void)strlcpy(buf, "hello from test program", sizeof(buf));
 
-	strlcpy(buf, "writing to mydev", sizeof(buf));
-	if (write(dev, buf, sizeof(buf)) < 0)
+	printf("%s: write()\t\t\t-> %s\n", getprogname(), buf);
+	fflush(stdout);
+
+	if (write(fd, buf, sizeof(buf)) < 0)
 		err(1, "write");
+	if (read(fd, buf, sizeof(buf)) < 0)
+		err(1, "read");
+	printf("%s: read()\t\t\t-> %s\n", getprogname(), buf);
 
-	close(dev);
+	close(fd);
 
 	return (0);
 }
