@@ -16,7 +16,7 @@ func usage() {
 
 func main() {
 	var path, date string;
-	var n, loss, gain, total float64;
+	var n, loss, gain float64;
 	var arglen int;
 	var dflag bool;
 
@@ -68,13 +68,12 @@ func main() {
 		if n >= 0 {
 			gain += n;
 		} else {
-			loss += n;
+			loss -= n;
 		}
-		total += n;
-		fmt.Printf("%-15s %-20s %-.2f\n", line[0], line[1], n);
+		fmt.Printf("%-15s %-20s %+.2f\n", line[0], line[1], n);
 	}
 	fmt.Println();
-	fmt.Printf("Loss:  %.2f\n", -loss);
-	fmt.Printf("Gain:  %.2f\n", gain);
-	fmt.Printf("Total: %.2f\n", total);
+	fmt.Printf("Gain:  %+.2f\n", gain);
+	fmt.Printf("Loss:  %+.2f\n", -loss);
+	fmt.Printf("Gross: %+.2f\n", gain - loss);
 }
